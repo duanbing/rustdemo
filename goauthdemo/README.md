@@ -1,5 +1,7 @@
 # Use Examples
 
+This is a demo that shows how to use ECDSA-based JWT as token generator in Go Oauth2.
+
 ## Run Server
 
 ``` bash
