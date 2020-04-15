@@ -70,6 +70,18 @@ Open the browser [http://localhost:9094/pwd](http://localhost:9094/pwd)
 }
 ```
 
+## Verify the token by client itself
+
+Open the browser [http://localhost:9094/verify](http://localhost:9094/verify)
+```
+{
+aud: "222222",
+exp: 1586957432,
+sub: "222222"
+}
+```
+
+
 ## Client Credentials Grant
 
 Open the browser [http://localhost:9094/client](http://localhost:9094/client)
