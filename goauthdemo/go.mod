@@ -1,4 +1,4 @@
-module github.com/xuperdata/xuperdid
+module github.com/xuperdata/xuperdid/demo
 
 go 1.14
 

@@ -13,6 +13,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+
+	"github.com/xuperdata/xuperdid/demo/jwtutil"
 )
 
 const (
@@ -93,21 +95,26 @@ func main() {
 				http.Redirect(w, r, "/", http.StatusFound)
 				return
 			}
-			//TODO
-			signedKey := []byte("00000000")
+			//signedKey := []byte(jwtutil.SIGNED_KEY)
+			signedKey := jwtutil.GetPublicKey()
 			token, err := jwt.Parse(globalToken.AccessToken, func(token *jwt.Token) (interface{}, error) {
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				//if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
 					return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 				}
 				return signedKey, nil
 			})
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 			parts := strings.Split(globalToken.AccessToken, ".")
 			verifyErr := token.Method.Verify(strings.Join(parts[0:2], "."), token.Signature, signedKey)
 			if verifyErr != nil {
 				fmt.Println(verifyErr)
 				e := json.NewEncoder(w)
 				e.SetIndent("", "  ")
-				e.Encode(verifyErr)
+				e.Encode(verifyErr.Error())
 				return
 			}
 			if claims, ok := token.Claims.(jwt.Claims); ok && token.Valid {

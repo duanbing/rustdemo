@@ -16,6 +16,8 @@ import (
 	"gopkg.in/oauth2.v3/models"
 	"gopkg.in/oauth2.v3/server"
 	"gopkg.in/oauth2.v3/store"
+
+	"github.com/xuperdata/xuperdid/demo/jwtutil"
 )
 
 func main() {
@@ -26,7 +28,9 @@ func main() {
 	manager.MustTokenStorage(store.NewMemoryTokenStore())
 
 	// generate jwt access token
-	manager.MapAccessGenerate(generates.NewJWTAccessGenerate([]byte("00000000"), jwt.SigningMethodHS512))
+	//manager.MapAccessGenerate(generates.NewJWTAccessGenerate([]byte(jwtutil.SIGNED_KEY), jwt.SigningMethodHS512))
+
+	manager.MapAccessGenerate(generates.NewJWTAccessGenerate(jwtutil.GetPrivateKey(), jwt.SigningMethodES256))
 
 	clientStore := store.NewClientStore()
 	clientStore.Set("222222", &models.Client{
