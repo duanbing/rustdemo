@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -17,7 +18,8 @@ import (
 	"gopkg.in/oauth2.v3/server"
 	"gopkg.in/oauth2.v3/store"
 
-	"github.com/xuperdata/xuperdid/demo/jwtutil"
+	"github.com/xuperdata/xuperdid/issuer"
+	"github.com/xuperdata/xuperdid/jwtutil"
 )
 
 func main() {
@@ -30,6 +32,7 @@ func main() {
 	// generate jwt access token
 	//manager.MapAccessGenerate(generates.NewJWTAccessGenerate([]byte(jwtutil.SIGNED_KEY), jwt.SigningMethodHS512))
 
+	// TODO 从signature/signer获得私钥信息
 	manager.MapAccessGenerate(generates.NewJWTAccessGenerate(jwtutil.GetPrivateKey(), jwt.SigningMethodES256))
 
 	clientStore := store.NewClientStore()
@@ -50,6 +53,7 @@ func main() {
 	})
 
 	srv.SetUserAuthorizationHandler(userAuthorizeHandler)
+	srv.SetAuthorizeScopeHandler(authorizeScopeHandler)
 
 	srv.SetInternalErrorHandler(func(err error) (re *errors.Response) {
 		log.Println("Internal Error:", err.Error())
@@ -86,9 +90,7 @@ func main() {
 	})
 
 	http.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%#v %#v", w, r)
 		err := srv.HandleTokenRequest(w, r)
-		log.Printf("%#v %#v", w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -141,6 +143,26 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 	store.Delete("LoggedInUserID")
 	store.Save()
 	return
+}
+
+func authorizeScopeHandler(w http.ResponseWriter, r *http.Request) (scope string, err error) {
+	store, err := session.Start(nil, w, r)
+	if err != nil {
+		return
+	}
+
+	uid, ok := store.Get("LoggedInUserID")
+	if !ok {
+		return "", errors.New("invalid userid when handling scopes")
+	}
+
+	userID := uid.(string)
+
+	is := issuer.NewIssuer()
+	rawScope := r.Form.Get("scope") //TODO scopes全部变成did
+	rawScopes := strings.Split(rawScope, " ")
+	scopes, err := is.GetScopes(userID, rawScopes)
+	return scopes, err
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {

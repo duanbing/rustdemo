@@ -94,7 +94,7 @@ func GetPrivateKey() []byte {
 }
 
 //获取签名算法为HS256的token
-func GetHStoken(tokenFirst string, id, username string) string {
+func getHStoken(tokenFirst string, id, username string) string {
 	claims := jwt.MapClaims{
 		"tokenES": tokenFirst,
 		//解析时，该变量的类型被转换成float64
@@ -113,7 +113,7 @@ func GetHStoken(tokenFirst string, id, username string) string {
 }
 
 //解析签名算法为ES256的token
-func ParseEStoken(tokenES string) string {
+func parseEStoken(tokenES string) string {
 	keyX := new(big.Int)
 	keyY := new(big.Int)
 
@@ -146,7 +146,7 @@ func ParseEStoken(tokenES string) string {
 }
 
 //解析签名算法为HS256的token
-func ParseHStoken(tokenString string) jwt.MapClaims {
+func parseHStoken(tokenString string) jwt.MapClaims {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SIGNED_KEY), nil
 	})

@@ -14,7 +14,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"github.com/xuperdata/xuperdid/demo/jwtutil"
+	"github.com/xuperdata/xuperdid/jwtutil"
 )
 
 const (
@@ -55,7 +55,6 @@ func main() {
 				http.Error(w, "Code not found", http.StatusBadRequest)
 				return
 			}
-			println("duanbing: " + code)
 			token, err := config.Exchange(context.Background(), code)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
