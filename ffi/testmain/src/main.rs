@@ -51,7 +51,7 @@ fn main() {
         len: c_arr.len() as libc::c_longlong,
         cap: c_arr.len() as libc::c_longlong,
     });
-    // 这段内存需要保持到返回为止
+    // 后面还需要继续访问这段内存
     std::mem::forget(c_arr);
 
     println!("begin to call");
