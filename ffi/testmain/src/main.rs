@@ -1,7 +1,5 @@
 extern crate libc;
 
-use libc::c_longlong;
-
 use std::ffi::{CStr, CString};
 
 #[derive(Debug)]
@@ -20,7 +18,7 @@ struct GoSlice {
 }
 
 extern "C" {
-    fn Add(a: c_longlong, b: c_longlong) -> c_longlong;
+    fn Add(a: libc::c_longlong, b: libc::c_longlong) -> libc::c_longlong;
     fn AddArray(a: GoSlice, b: GoSlice, c: *mut GoSlice);
     fn AddString(a: GoString, b: GoString) -> *mut libc::c_char;
 }
