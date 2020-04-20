@@ -79,6 +79,7 @@ fn main() {
         a: ptr,
         b: c_path.as_bytes().len() as i64,
     };
+    
     let c_path = CString::new("hello duanbing cstring").expect("CString::new failed");
     let ptr = c_path.as_ptr();
     let go_string2 = GoString {
@@ -88,6 +89,8 @@ fn main() {
 
     println!("go go ");
     let res = unsafe { AddString(go_string, go_string2) };
+    // https://stackoverflow.com/questions/24145823/how-do-i-convert-a-c-string-into-a-rust-string-and-back-via-ffi
+    // 需要释放内存 TODO
     let c_str = unsafe { CStr::from_ptr(res) };
     println!("res: {:?}", c_str.to_str().unwrap());
 
