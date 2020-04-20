@@ -1,7 +1,5 @@
 extern crate libc;
 
-use libc::c_longlong;
-
 use std::ffi::{CStr, CString};
 
 #[derive(Debug)]
@@ -19,10 +17,17 @@ struct GoSlice {
     cap: libc::c_longlong,
 }
 
+#[repr(C)]
+struct AddMultiRet_return {
+    r0: *const libc::c_char,
+    r1: libc::c_longlong,
+}
+
 extern "C" {
-    fn Add(a: c_longlong, b: c_longlong) -> c_longlong;
+    fn Add(a: libc::c_longlong, b: libc::c_longlong) -> libc::c_longlong;
     fn AddArray(a: GoSlice, b: GoSlice, c: *mut GoSlice);
     fn AddString(a: GoString, b: GoString) -> *mut libc::c_char;
+    fn AddMultiRet() -> AddMultiRet_return;
 }
 
 fn main() {
@@ -51,7 +56,7 @@ fn main() {
         len: c_arr.len() as libc::c_longlong,
         cap: c_arr.len() as libc::c_longlong,
     });
-    // 这段内存需要保持到返回为止
+    // 在后面还要再次取回，因此要保存直到手动释放
     std::mem::forget(c_arr);
 
     println!("begin to call");
@@ -85,4 +90,8 @@ fn main() {
     let res = unsafe { AddString(go_string, go_string2) };
     let c_str = unsafe { CStr::from_ptr(res) };
     println!("res: {:?}", c_str.to_str().unwrap());
+
+    let res = unsafe { AddMultiRet() };
+    let c_str = unsafe { CStr::from_ptr(res.r0) };
+    println!("res: {:?}, len={}", c_str.to_str().unwrap(), res.r1);
 }

@@ -25,4 +25,9 @@ func AddString(a string, b string) *C.char {
 	return C.CString(c)
 }
 
+//export AddMultiRet
+func AddMultiRet() (*C.char, int64) {
+	return C.CString("nihaop!"), 7
+}
+
 func main() {}

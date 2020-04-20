@@ -75,6 +75,14 @@ extern void AddArray(GoSlice p0, GoSlice p1, GoSlice* p2);
 
 extern char* AddString(GoString p0, GoString p1);
 
+/* Return type for AddMultiRet */
+struct AddMultiRet_return {
+	char* r0;
+	GoInt64 r1;
+};
+
+extern struct AddMultiRet_return AddMultiRet();
+
 #ifdef __cplusplus
 }
 #endif
